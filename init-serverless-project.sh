@@ -508,7 +508,7 @@ import schema from './schema';
 const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   const { name } = event.body;
   return formatJSONResponse({
-    message: \`Hello \${name}! Welcome to the exciting Serverless world!\`,
+    message: `Hello ${name}! Welcome to the exciting Serverless world!`,
     event,
   });
 };
