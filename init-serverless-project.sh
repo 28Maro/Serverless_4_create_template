@@ -11,54 +11,54 @@ echo -e "${BLUE}🚀 Generador de Proyecto Serverless v4 con TypeScript${NC}"
 echo -e "${BLUE}====================================================${NC}"
 
 # Verificar si Serverless Framework está instalado
-if ! command -v serverless &> /dev/null; then
-    echo -e "${RED}❌ Serverless Framework no está instalado.${NC}"
-    echo -e "${YELLOW}Instálalo con: npm install -g serverless${NC}"
-    exit 1
+if ! command -v serverless &>/dev/null; then
+  echo -e "${RED}❌ Serverless Framework no está instalado.${NC}"
+  echo -e "${YELLOW}Instálalo con: npm install -g serverless${NC}"
+  exit 1
 fi
 
 # Verificar si Node.js está instalado
-if ! command -v node &> /dev/null; then
-    echo -e "${RED}❌ Node.js no está instalado.${NC}"
-    exit 1
+if ! command -v node &>/dev/null; then
+  echo -e "${RED}❌ Node.js no está instalado.${NC}"
+  exit 1
 fi
 
 # Verificar si npm está instalado
-if ! command -v npm &> /dev/null; then
-    echo -e "${RED}❌ npm no está instalado.${NC}"
-    exit 1
+if ! command -v npm &>/dev/null; then
+  echo -e "${RED}❌ npm no está instalado.${NC}"
+  exit 1
 fi
 
 # Obtener nombre del proyecto (parámetro o input interactivo)
 if [ -n "$1" ]; then
-    PROJECT_NAME="$1"
-    echo -e "${GREEN}📝 Usando nombre del proyecto: ${YELLOW}$PROJECT_NAME${NC}"
+  PROJECT_NAME="$1"
+  echo -e "${GREEN}📝 Usando nombre del proyecto: ${YELLOW}$PROJECT_NAME${NC}"
 elif [ -n "$PROJECT_NAME" ]; then
-    # Variable de entorno (para uso con curl)
-    echo -e "${GREEN}📝 Usando nombre del proyecto: ${YELLOW}$PROJECT_NAME${NC}"
+  # Variable de entorno (para uso con curl)
+  echo -e "${GREEN}📝 Usando nombre del proyecto: ${YELLOW}$PROJECT_NAME${NC}"
 else
-    # Input interactivo
-    echo -e "${YELLOW}📝 Ingresa el nombre de tu proyecto:${NC}"
-    read -p "Nombre del proyecto: " PROJECT_NAME
+  # Input interactivo
+  echo -e "${YELLOW}📝 Ingresa el nombre de tu proyecto:${NC}"
+  read -p "Nombre del proyecto: " PROJECT_NAME
 fi
 
 # Validar que el nombre no esté vacío
 if [ -z "$PROJECT_NAME" ]; then
-    echo -e "${RED}❌ El nombre del proyecto no puede estar vacío.${NC}"
-    exit 1
+  echo -e "${RED}❌ El nombre del proyecto no puede estar vacío.${NC}"
+  exit 1
 fi
 
 # Limpiar el nombre del proyecto para que sea válido para Serverless
 PROJECT_NAME_CLEAN=$(echo "$PROJECT_NAME" | sed 's/[^a-zA-Z0-9-]//g' | sed 's/^[^a-zA-Z]*//' | sed 's/--*/-/g')
 if [ -z "$PROJECT_NAME_CLEAN" ]; then
-    PROJECT_NAME_CLEAN="my-serverless-project"
-    echo -e "${YELLOW}⚠️ Nombre corregido a: $PROJECT_NAME_CLEAN${NC}"
+  PROJECT_NAME_CLEAN="my-serverless-project"
+  echo -e "${YELLOW}⚠️ Nombre corregido a: $PROJECT_NAME_CLEAN${NC}"
 fi
 
 # Verificar si el directorio ya existe
 if [ -d "$PROJECT_NAME" ]; then
-    echo -e "${RED}❌ El directorio '$PROJECT_NAME' ya existe.${NC}"
-    exit 1
+  echo -e "${RED}❌ El directorio '$PROJECT_NAME' ya existe.${NC}"
+  exit 1
 fi
 
 echo -e "${GREEN}📂 Creando directorio del proyecto...${NC}"
@@ -66,7 +66,7 @@ mkdir "$PROJECT_NAME"
 cd "$PROJECT_NAME"
 
 echo -e "${GREEN}📦 Inicializando package.json...${NC}"
-cat > package.json << EOF
+cat >package.json <<EOF
 {
   "name": "$PROJECT_NAME",
   "version": "1.0.0",
@@ -80,7 +80,7 @@ cat > package.json << EOF
     "logs": "serverless logs -f",
     "invoke": "serverless invoke -f",
     "invoke:local": "serverless invoke local -f",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint .",
     "lint:fix": "eslint . --ext .ts --fix",
     "type-check": "tsc --noEmit",
     "test": "jest",
@@ -93,9 +93,10 @@ cat > package.json << EOF
     "@types/node": "^22.10.0",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
+    "@eslint/js": "^9.15.0",
     "eslint": "^9.15.0",
     "jest": "^29.7.0",
-    "serverless-offline": "^14.0.0",
+    "serverless-offline": "^13.8.0",
     "ts-jest": "^29.2.0",
     "typescript": "^5.7.0"
   },
@@ -110,7 +111,7 @@ cat > package.json << EOF
 EOF
 
 echo -e "${GREEN}⚙️ Creando configuración de TypeScript...${NC}"
-cat > tsconfig.json << EOF
+cat >tsconfig.json <<EOF
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -159,7 +160,7 @@ cat > tsconfig.json << EOF
 EOF
 
 echo -e "${GREEN}🔧 Creando configuración de ESLint...${NC}"
-cat > eslint.config.js << 'EOF'
+cat >eslint.config.js <<'EOF'
 import js from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
@@ -200,7 +201,7 @@ export default [
 EOF
 
 echo -e "${GREEN}🧪 Creando configuración de Jest...${NC}"
-cat > jest.config.js << EOF
+cat >jest.config.js <<EOF
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
@@ -225,7 +226,7 @@ module.exports = {
 EOF
 
 echo -e "${GREEN}📝 Creando archivo .gitignore...${NC}"
-cat > .gitignore << EOF
+cat >.gitignore <<EOF
 # Logs
 logs
 *.log
@@ -347,7 +348,7 @@ build/
 EOF
 
 echo -e "${GREEN}⚡ Creando configuración principal de Serverless (serverless.ts)...${NC}"
-cat > serverless.ts << 'EOF'
+cat >serverless.ts <<'EOF'
 import type { AWS } from '@serverless/typescript';
 import { hello } from '@functions/index';
 
@@ -448,7 +449,7 @@ mkdir -p src/{functions,libs}
 mkdir -p src/functions/hello
 
 echo -e "${GREEN}🔧 Creando función de ejemplo 'hello'...${NC}"
-cat > src/functions/hello/handler.ts << EOF
+cat >src/functions/hello/handler.ts <<EOF
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
@@ -466,7 +467,7 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) =
 export const main = middyfy(hello);
 EOF
 
-cat > src/functions/hello/index.ts << EOF
+cat >src/functions/hello/index.ts <<EOF
 import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 
@@ -488,7 +489,7 @@ export default {
 };
 EOF
 
-cat > src/functions/hello/schema.ts << EOF
+cat >src/functions/hello/schema.ts <<EOF
 export default {
   type: 'object',
   properties: {
@@ -499,7 +500,7 @@ export default {
 } as const;
 EOF
 
-cat > src/functions/hello/mock.json << EOF
+cat >src/functions/hello/mock.json <<EOF
 {
   "headers": {
     "Content-Type": "application/json"
@@ -509,12 +510,12 @@ cat > src/functions/hello/mock.json << EOF
 EOF
 
 echo -e "${GREEN}📋 Creando archivo de índice de funciones...${NC}"
-cat > src/functions/index.ts << EOF
+cat >src/functions/index.ts <<EOF
 export { default as hello } from './hello';
 EOF
 
 echo -e "${GREEN}🛠️ Creando librerías auxiliares...${NC}"
-cat > src/libs/api-gateway.ts << EOF
+cat >src/libs/api-gateway.ts <<EOF
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Handler } from 'aws-lambda';
 import type { FromSchema } from 'json-schema-to-ts';
 
@@ -549,13 +550,13 @@ export const formatErrorResponse = (statusCode: number, message: string): APIGat
 };
 EOF
 
-cat > src/libs/handler-resolver.ts << EOF
+cat >src/libs/handler-resolver.ts <<EOF
 export const handlerPath = (context: string): string => {
   return \`\${context.split(process.cwd())[1].substring(1).replace(/\\\\/g, '/')}\`;
 };
 EOF
 
-cat > src/libs/lambda.ts << EOF
+cat >src/libs/lambda.ts <<EOF
 import middy from '@middy/core';
 import middyJsonBodyParser from '@middy/http-json-body-parser';
 
@@ -566,7 +567,7 @@ EOF
 
 echo -e "${GREEN}🧪 Creando pruebas de ejemplo...${NC}"
 mkdir -p src/functions/hello/__tests__
-cat > src/functions/hello/__tests__/handler.test.ts << EOF
+cat >src/functions/hello/__tests__/handler.test.ts <<EOF
 import { main } from '../handler';
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
@@ -602,7 +603,7 @@ describe('Hello Handler', () => {
 EOF
 
 echo -e "${GREEN}📖 Creando archivo README...${NC}"
-cat > README.md << EOF
+cat >README.md <<EOF
 # $PROJECT_NAME
 
 Proyecto Serverless Framework v4 con TypeScript y Node.js 22
