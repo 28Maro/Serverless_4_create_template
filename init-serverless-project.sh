@@ -702,7 +702,7 @@ El proyecto incluye:
 
 2. Prueba la función hello:
    \`\`\`bash
-   curl -X POST http://localhost:3000/hello \\
+   curl -X POST http://localhost:3000/dev/hello \\
      -H "Content-Type: application/json" \\
      -d '{"name": "Mundo"}'
    \`\`\`
