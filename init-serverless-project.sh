@@ -74,14 +74,12 @@ cat >package.json <<EOF
   "main": "handler.js",
   "scripts": {
     "dev": "serverless offline",
-    "deploy": "serverless deploy",
+    "deploy": "serverless deploy", 
     "deploy:prod": "serverless deploy --stage prod",
     "remove": "serverless remove",
     "logs": "serverless logs -f",
     "invoke": "serverless invoke -f",
     "invoke:local": "serverless invoke local -f",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --ext .ts --fix",
     "type-check": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch"
@@ -89,12 +87,8 @@ cat >package.json <<EOF
   "devDependencies": {
     "@serverless/typescript": "^4.14.1",
     "@types/aws-lambda": "^8.10.145",
-    "@types/jest": "^29.5.8",
+    "@types/jest": "^29.5.8", 
     "@types/node": "^22.10.0",
-    "@typescript-eslint/eslint-plugin": "^8.15.0",
-    "@typescript-eslint/parser": "^8.15.0",
-    "@eslint/js": "^9.15.0",
-    "eslint": "^9.15.0",
     "jest": "^29.7.0",
     "serverless-offline": "^13.8.0",
     "ts-jest": "^29.2.0",
@@ -105,7 +99,7 @@ cat >package.json <<EOF
     "@middy/http-json-body-parser": "^5.5.0",
     "json-schema-to-ts": "^3.1.0"
   },
-  "author": "",
+  "author": "OLC",
   "license": "MIT"
 }
 EOF
@@ -161,79 +155,6 @@ cat >tsconfig.json <<EOF
 }
 EOF
 
-echo -e "${GREEN}🔧 Creando configuración de ESLint...${NC}"
-cat > eslint.config.js << 'EOF'
-const js = require('@eslint/js');
-const tseslint = require('@typescript-eslint/eslint-plugin');
-const tsparser = require('@typescript-eslint/parser');
-
-module.exports = [
-  js.configs.recommended,
-  {
-    files: ['**/*.{ts}'],
-    languageOptions: {
-      parser: tsparser,
-      parserOptions: {
-        ecmaVersion: 2022,
-        sourceType: 'module',
-        project: './tsconfig.json',
-      },
-      globals: {
-        process: 'readonly',
-        __dirname: 'readonly',
-        module: 'readonly',
-        require: 'readonly',
-        Buffer: 'readonly',
-        console: 'readonly',
-      },
-    },
-    plugins: {
-      '@typescript-eslint': tseslint,
-    },
-    rules: {
-      ...tseslint.configs.recommended.rules,
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/explicit-function-return-type': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-floating-promises': 'error',
-      'no-undef': 'off',
-    },
-  },
-  {
-    files: ['**/*.test.{ts,js}', '**/__tests__/**/*.{ts,js}'],
-    languageOptions: {
-      globals: {
-        describe: 'readonly',
-        it: 'readonly',
-        expect: 'readonly',
-        beforeEach: 'readonly',
-        afterEach: 'readonly',
-        beforeAll: 'readonly',
-        afterAll: 'readonly',
-        jest: 'readonly',
-      },
-    },
-  },
-  {
-    files: ['eslint.config.js', 'jest.config.js'],
-    languageOptions: {
-      sourceType: 'script',
-      parserOptions: {
-        project: null,
-      },
-    },
-  },
-  {
-    ignores: [
-      'node_modules/',
-      '.serverless/',
-      '.build/',
-      'dist/',
-      'coverage/',
-    ],
-  },
-];
-EOF
 
 echo -e "${GREEN}🧪 Creando configuración de Jest...${NC}"
 cat >jest.config.js <<EOF
