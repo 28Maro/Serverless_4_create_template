@@ -13,13 +13,14 @@ echo -e "${BLUE}====================================================${NC}"
 # Verificar si Serverless Framework está instalado
 if ! command -v serverless &>/dev/null; then
   echo -e "${RED}❌ Serverless Framework no está instalado.${NC}"
-  echo -e "${YELLOW}Instálalo con: npm install -g serverless${NC}"
+  echo -e "${YELLOW}Instálalo con: npm install -g serverless@^4${NC}"
   exit 1
 fi
 
 # Verificar si Node.js está instalado
 if ! command -v node &>/dev/null; then
   echo -e "${RED}❌ Node.js no está instalado.${NC}"
+  echo -e "${YELLOW}Instálalo con: nvm install 22 && nvm use 22${NC}"
   exit 1
 fi
 
@@ -28,6 +29,56 @@ if ! command -v npm &>/dev/null; then
   echo -e "${RED}❌ npm no está instalado.${NC}"
   exit 1
 fi
+
+# ————————————————————————————————————————————————
+# 1️⃣ Validación de versión mínima de Node.js (22.x)
+NODE_VER=$(node -v) 
+NODE_MAJOR=$(echo "$NODE_VER" | sed -E 's/^v([0-9]+).*/\1/')
+if [ "$NODE_MAJOR" -lt 22 ]; then
+  echo -e "${RED}❌ Tu versión de Node.js es $NODE_VER pero se requiere >= v22.x${NC}"
+  echo -e "${YELLOW}Actualízala con: nvm install 22 && nvm use 22${NC}"
+  exit 1
+else
+  echo -e "${GREEN}✔ Node.js $NODE_VER cumple el requisito${NC}"
+fi
+
+# 2️⃣ Validación de versión mínima de Serverless Framework (4.x)
+SL_VER=$(serverless --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+SL_MAJOR=$(echo "$SL_VER" | cut -d. -f1)
+if [ -z "$SL_MAJOR" ] || [ "$SL_MAJOR" -lt 4 ]; then
+  INSTALLED=$(serverless --version 2>/dev/null || echo "no instalada")
+  echo -e "${RED}❌ Tu Serverless CLI es $INSTALLED y se requiere v4.x${NC}"
+  echo -e "${YELLOW}Actualízala con: npm install -g serverless@^4${NC}"
+  exit 1
+else
+  echo -e "${GREEN}✔ Serverless Framework $SL_VER cumple el requisito${NC}"
+fi
+
+# ————————————————————————————————————————————————
+# 3️⃣ Chequeo de versiones globales contra npm
+
+# Serverless Framework
+INSTALLED_SL=$(serverless --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+LATEST_SL=$(npm view serverless version 2>/dev/null)
+if [ -n "$INSTALLED_SL" ] && [ "$INSTALLED_SL" != "$LATEST_SL" ]; then
+  echo -e "${YELLOW}⚠️  Tu Serverless CLI está en v$INSTALLED_SL, pero la última es v$LATEST_SL${NC}"
+  echo -e "${YELLOW}   Para actualizar: npm install -g serverless@^4${NC}"
+else
+  echo -e "${GREEN}✔ Serverless CLI v$INSTALLED_SL está al día (última: v$LATEST_SL)${NC}"
+fi
+
+# serverless-offline (plugin)
+if command -v npm &>/dev/null; then
+  INSTALLED_OFFLINE=$(npm ls -g serverless-offline --depth=0 2>/dev/null | grep serverless-offline@ | cut -d@ -f2)
+  LATEST_OFFLINE=$(npm view serverless-offline version 2>/dev/null)
+  if [ -n "$INSTALLED_OFFLINE" ] && [ "$INSTALLED_OFFLINE" != "$LATEST_OFFLINE" ]; then
+    echo -e "${YELLOW}⚠️  Tienes serverless-offline v$INSTALLED_OFFLINE, pero la última es v$LATEST_OFFLINE${NC}"
+    echo -e "${YELLOW}   Para actualizar: npm install -g serverless-offline@^14${NC}"
+  else
+    echo -e "${GREEN}✔ serverless-offline v$INSTALLED_OFFLINE está al día (última: v$LATEST_OFFLINE)${NC}"
+  fi
+fi
+# ————————————————————————————————————————————————
 
 # Obtener nombre del proyecto (parámetro o input interactivo)
 if [ -n "$1" ]; then
