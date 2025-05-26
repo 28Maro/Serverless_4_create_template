@@ -85,8 +85,8 @@ cat >package.json <<EOF
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "serverless": "^4.14.4",
-    "@serverless/typescript": "^4.14.4",
+    "serverless": "^4.14.1",
+    "@serverless/typescript": "^4.14.1",
     "@types/aws-lambda": "^8.10.145",
     "@types/jest": "^29.5.8",
     "@types/node": "^20.10.0",
@@ -401,7 +401,7 @@ module.exports = serverlessConfiguration;
 EOF
 
 # Reemplazar el placeholder con el nombre limpio del proyecto
-sed -i "s/\\\$PROJECT_NAME_CLEAN/$PROJECT_NAME_CLEAN/g" serverless.ts
+sed -i '' "s/\\\$PROJECT_NAME_CLEAN/$PROJECT_NAME_CLEAN/g" serverless.ts
 
 echo -e "${GREEN}📁 Creando estructura de directorios...${NC}"
 mkdir -p src/{functions,libs}
