@@ -330,7 +330,7 @@ import type { AWS } from '@serverless/typescript';
 import { hello } from '@functions/index';
 
 const serverlessConfiguration: AWS = {
-  service: '$PROJECT_NAME',
+  service: '$PROJECT_NAME_CLEAN',
   frameworkVersion: '4',
   
   provider: {
@@ -369,7 +369,6 @@ const serverlessConfiguration: AWS = {
     },
   },
 
-  // Configuración de build nativa de Serverless v4
   build: {
     esbuild: {
       bundle: true,
@@ -381,11 +380,9 @@ const serverlessConfiguration: AWS = {
         'require.resolve': undefined,
       },
       platform: 'node',
-      concurrency: 10,
     },
   },
 
-  // Configuración por stages
   stages: {
     dev: {
       params: {
@@ -421,8 +418,8 @@ const serverlessConfiguration: AWS = {
 module.exports = serverlessConfiguration;
 EOF
 
-# Reemplazar el placeholder con el nombre real del proyecto
-sed -i "s/\$PROJECT_NAME/$PROJECT_NAME/g" serverless.ts
+# Reemplazar el placeholder con el nombre limpio del proyecto
+sed -i "s/\$PROJECT_NAME_CLEAN/$PROJECT_NAME_CLEAN/g" serverless.ts
 
 echo -e "${GREEN}📁 Creando estructura de directorios...${NC}"
 mkdir -p src/{functions,libs}
