@@ -139,8 +139,11 @@ cat >package.json <<EOF
   "description": "Serverless v4 TypeScript project",
   "main": "handler.js",
   "scripts": {
-    "dev": "serverless offline",
-    "deploy": "serverless deploy", 
+    "predev": "cp .env.dev .env || true",
+    "dev": "npm run predev && serverless offline",
+    "invoke:local:scheduledExample": "serverless invoke local -f scheduledExample --stage dev",
+    "predeploy:dev": "cp .env.dev .env || true",
+    "deploy:dev": "npm run predeploy:dev && serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
     "remove": "serverless remove",
     "logs": "serverless logs -f",
@@ -162,8 +165,7 @@ cat >package.json <<EOF
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.0",
     "@middy/http-json-body-parser": "^5.5.0",
-    "@middy/validator": "^5.5.0",
-    "serverless-dotenv-plugin": "^6.0.0"
+    "@middy/validator": "^5.5.0"
   },
   "dependencies": {
     "@middy/core": "^5.5.0",
@@ -379,7 +381,6 @@ EOF
 
 echo -e "${GREEN}⚡ Creando configuración principal de Serverless (serverless.ts)...${NC}"
 cat >serverless.ts <<'EOF'
-import 'dotenv/config';
 import 'tsconfig-paths/register'; 
 import type { AWS } from '@serverless/typescript';
 import { hello } from './src/functions/index';
@@ -387,7 +388,8 @@ import { hello } from './src/functions/index';
 const serverlessConfiguration: AWS = {
   service: '$PROJECT_NAME_CLEAN',
   frameworkVersion: '4',
-  plugins: ['serverless-offline','serverless-offline'],
+  useDotenv: true,
+  plugins: ['serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs22.x',
@@ -898,7 +900,12 @@ echo -e "${BLUE}🚀 Para empezar:${NC}"
 echo -e "  ${YELLOW}cd $PROJECT_NAME${NC}"
 echo -e "  ${YELLOW}npm run dev${NC}"
 echo ""
-echo -e "${BLUE}🧪 Para probar la función:${NC}"
-echo -e "  ${YELLOW}curl -X POST http://localhost:3000/dev/hello -H \"Content-Type: application/json\" -d '{\"name\": \"Mundo\"}'${NC}"
+echo -e "${BLUE}🧪 Para probar la función HTTP “hello”:${NC}"
+echo -e "  ${YELLOW}curl -X POST http://localhost:3000/dev/hello \\"
+echo -e "    -H \"Content-Type: application/json\" \\"
+echo -e "    -d '{\"name\": \"Mundo\"}'${NC}"
+echo ""
+echo -e "${BLUE}🧪 Para invocar localmente la función programada “scheduledExample”:${NC}"
+echo -e "  ${YELLOW}npm run invoke:local:scheduledExample${NC}"
 echo ""
 echo -e "${GREEN}🎉 ¡Happy coding!${NC}"
