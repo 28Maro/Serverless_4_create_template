@@ -499,7 +499,7 @@ mkdir -p src/{functions,libs}
 mkdir -p src/functions/hello
 
 echo -e "${GREEN}🔧 Creando función de ejemplo 'hello'...${NC}"
-cat > src/functions/hello/handler.ts <<\EOF
+cat > src/functions/hello/handler.ts <<EOF
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
@@ -509,7 +509,7 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) =
   const { name } = event.body;
   
   return formatJSONResponse({
-    message: `Hello ${name}! Welcome to the exciting Serverless world!`,
+    message: \`Hello \${name}! Welcome to the exciting Serverless world!\`,
     event,
   });
 };
@@ -568,7 +568,7 @@ import type { Handler } from 'aws-lambda';
 export const main: Handler = async (_event, _context) => {
   const apiKey = process.env.MY_API_KEY;
   const level = process.env.LOG_LEVEL;
-  console.log(`🔑 Key=${apiKey} · Level=${level} · triggered at ${new Date().toISOString()}`);
+  console.log(\`🔑 Key=\${apiKey} · Level=\${level} · triggered at \${new Date().toISOString()}\`);
   return {
     statusCode: 200,
     body: JSON.stringify({ message: 'scheduledExample ejecutada con éxito' }),
@@ -902,12 +902,12 @@ echo -e "${BLUE}🚀 Para empezar:${NC}"
 echo -e "  ${YELLOW}cd $PROJECT_NAME${NC}"
 echo -e "  ${YELLOW}npm run dev${NC}"
 echo ""
-echo -e "${BLUE}🧪 Para probar la función HTTP “hello”:${NC}"
+echo -e "${BLUE}🧪 Para probar la función HTTP "hello":${NC}"
 echo -e "  ${YELLOW}curl -X POST http://localhost:3000/dev/hello \\"
 echo -e "    -H \"Content-Type: application/json\" \\"
 echo -e "    -d '{\"name\": \"Mundo\"}'${NC}"
 echo ""
-echo -e "${BLUE}🧪 Para invocar localmente la función programada “scheduledExample”:${NC}"
+echo -e "${BLUE}🧪 Para invocar localmente la función programada "scheduledExample":${NC}"
 echo -e "  ${YELLOW}npm run invoke:local:scheduledExample${NC}"
 echo ""
 echo -e "${GREEN}🎉 ¡Happy coding!${NC}"
