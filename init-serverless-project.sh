@@ -163,7 +163,7 @@ cat >package.json <<EOF
     "typescript": "^5.7.0",
     "@middy/http-json-body-parser": "^5.5.0",
     "@middy/validator": "^5.5.0",
-    "serverless-dotenv-plugin": "^5.1.0"
+    "serverless-dotenv-plugin": "^6.0.0"
   },
   "dependencies": {
     "@middy/core": "^5.5.0",
