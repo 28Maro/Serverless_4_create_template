@@ -160,7 +160,10 @@ cat >package.json <<EOF
     "serverless-offline": "^14.0.0", 
     "ts-jest": "^29.2.0",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "@middy/http-json-body-parser": "^5.5.0",
+    "@middy/validator": "^5.5.0",
+    "serverless-dotenv-plugin": "^5.1.0"
   },
   "dependencies": {
     "@middy/core": "^5.5.0",
@@ -369,10 +372,14 @@ Thumbs.db
 # Build outputs
 dist/
 build/
+
+# Environment files
+.env*
 EOF
 
 echo -e "${GREEN}⚡ Creando configuración principal de Serverless (serverless.ts)...${NC}"
 cat >serverless.ts <<'EOF'
+import 'dotenv/config';
 import 'tsconfig-paths/register'; 
 import type { AWS } from '@serverless/typescript';
 import { hello } from './src/functions/index';
@@ -380,7 +387,7 @@ import { hello } from './src/functions/index';
 const serverlessConfiguration: AWS = {
   service: '$PROJECT_NAME_CLEAN',
   frameworkVersion: '4',
-  
+  plugins: ['serverless-offline','serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs22.x',
@@ -399,6 +406,8 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       STAGE: '${self:provider.stage}',
+      MY_API_KEY: '${env:MY_API_KEY}',
+      LOG_LEVEL: '${env:LOG_LEVEL}',
     },
     iam: {
       role: {
@@ -444,14 +453,28 @@ const serverlessConfiguration: AWS = {
     },
   },
 
-  functions: { hello },
+  functions: {
+    hello,
+    // Función de ejemplo programada cada 5 minutos
+    scheduledExample: {
+      handler: 'src/functions/scheduled/handler.main',
+      events: [
+        {
+          schedule: {
+            rate: ['rate(5 minutes)'],
+            enabled: true,
+            name: '${self:service}-${self:provider.stage}-scheduledExample',
+            description: 'Invocación programada cada 5 min para ejemplo',
+          },
+        },
+      ],
+    },
+  }
 
   package: {
     individually: true,
     excludeDevDependencies: true,
   },
-
-  plugins: ['serverless-offline'],
 
   custom: {
     'serverless-offline': {
@@ -482,14 +505,12 @@ import schema from './schema';
 
 const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   const { name } = event.body;
-  
   return formatJSONResponse({
-    message: \`Hello \${name}! Welcome to the exciting Serverless world!\`,
-    event,
+    message: `Hello ${name}!`,
   });
 };
 
-export const main = middyfy(hello);
+export const main = middyfy(hello, schema);
 EOF
 
 cat >src/functions/hello/index.ts <<EOF
@@ -534,9 +555,62 @@ cat >src/functions/hello/mock.json <<EOF
 }
 EOF
 
+echo -e "${GREEN}📁 Creando función de ejemplo 'scheduledExample'...${NC}"
+mkdir -p src/functions/scheduled
+
+cat >src/functions/scheduled/handler.ts <<EOF
+import type { Handler } from 'aws-lambda';
+
+export const main: Handler = async (_event, _context) => {
+  const apiKey = process.env.MY_API_KEY;
+  const level = process.env.LOG_LEVEL;
+  console.log(`🔑 Key=${apiKey} · Level=${level} · triggered at`, new Date().toISOString());
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: 'scheduledExample ejecutada con éxito' }),
+  };
+};
+EOF
+
+cat >src/functions/scheduled/index.ts <<EOF
+export default {
+  handler: 'src/functions/scheduled/handler.main',
+  events: [
+    {
+      schedule: {
+        rate: ['rate(5 minutes)'],
+        enabled: true,
+        name: '\${self:service}-\${self:provider.stage}-scheduledExample',
+        description: 'Invocación programada cada 5 min para ejemplo',
+      },
+    },
+  ],
+};
+EOF
+
+echo -e "${GREEN}🧪 Creando test para 'scheduledExample'...${NC}"
+mkdir -p src/functions/scheduled/__tests__
+
+cat >src/functions/scheduled/__tests__/handler.test.ts <<EOF
+import { main } from '../handler';
+import { Context } from 'aws-lambda';
+
+describe('scheduledExample Handler', () => {
+  const mockContext: Context = {} as any;
+
+  it('debe responder con statusCode 200 y mensaje correcto', async () => {
+    const result = await main({}, mockContext, () => {});
+    expect(result.statusCode).toBe(200);
+    const body = JSON.parse(result.body as string);
+    expect(body.message).toBe('scheduledExample ejecutada con éxito');
+  });
+});
+EOF
+
 echo -e "${GREEN}📋 Creando archivo de índice de funciones...${NC}"
 cat >src/functions/index.ts <<EOF
 export { default as hello } from './hello';
+export { default as scheduledExample } from './scheduled';
 EOF
 
 echo -e "${GREEN}🛠️ Creando librerías auxiliares...${NC}"
@@ -581,12 +655,23 @@ export const handlerPath = (context: string): string => {
 };
 EOF
 
-cat >src/libs/lambda.ts <<EOF
+cat >src/libs/lambda.ts <<'EOF'
 import middy from '@middy/core';
-import middyJsonBodyParser from '@middy/http-json-body-parser';
+import jsonBodyParser from '@middy/http-json-body-parser';
+import validator from '@middy/validator';
 
-export const middyfy = (handler: any) => {
-  return middy(handler).use(middyJsonBodyParser());
+export const middyfy = (handler: any, schema?: object) => {
+  let m = middy(handler)
+    .use(jsonBodyParser());
+
+  if (schema) {
+    m = m.use(validator({ 
+      inputSchema: schema, 
+      ajvOptions: { strict: false } 
+    }));
+  }
+
+  return m;
 };
 EOF
 
@@ -794,6 +879,13 @@ serverless deploy --stage prod
 ## 📄 Licencia
 
 MIT
+EOF
+
+echo -e "${GREEN}🔐 Creando archivo de variables de entorno .env.dev...${NC}"
+cat > .env.dev <<EOF
+# Variables de entorno para desarrollo
+MY_API_KEY=your_api_key_here
+LOG_LEVEL=info
 EOF
 
 echo -e "${GREEN}📦 Instalando dependencias...${NC}"
