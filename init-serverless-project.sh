@@ -499,7 +499,7 @@ mkdir -p src/{functions,libs}
 mkdir -p src/functions/hello
 
 echo -e "${GREEN}🔧 Creando función de ejemplo 'hello'...${NC}"
-cat >src/functions/hello/handler.ts <<EOF
+cat > src/functions/hello/handler.ts <<\EOF
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
@@ -507,13 +507,14 @@ import schema from './schema';
 
 const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   const { name } = event.body;
+  
   return formatJSONResponse({
     message: `Hello ${name}! Welcome to the exciting Serverless world!`,
     event,
   });
 };
 
-export const main = middyfy(hello, schema);
+export const main = middyfy(hello);
 EOF
 
 cat >src/functions/hello/index.ts <<EOF
