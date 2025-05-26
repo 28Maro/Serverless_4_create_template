@@ -1,0 +1,26 @@
+{
+  "name": "serverless-v4-typescript-template",
+  "version": "1.0.0",
+  "description": "Template para Serverless Framework v4 con TypeScript y Node.js 22",
+  "main": "serverless.ts",
+  "scripts": {
+    "create-project": "./init-serverless-project.sh"
+  },
+  "keywords": [
+    "serverless",
+    "typescript",
+    "aws",
+    "lambda",
+    "template",
+    "nodejs22"
+  ],
+  "author": "Tu Nombre",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/serverless-v4-typescript-template.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
