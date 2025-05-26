@@ -471,7 +471,7 @@ const serverlessConfiguration: AWS = {
         },
       ],
     },
-  }
+  },
 
   package: {
     individually: true,
@@ -566,7 +566,7 @@ import type { Handler } from 'aws-lambda';
 export const main: Handler = async (_event, _context) => {
   const apiKey = process.env.MY_API_KEY;
   const level = process.env.LOG_LEVEL;
-  console.log(`🔑 Key=${apiKey} · Level=${level} · triggered at`, new Date().toISOString());
+  console.log(`🔑 Key=${apiKey} · Level=${level} · triggered at ${new Date().toISOString()}`);
   return {
     statusCode: 200,
     body: JSON.stringify({ message: 'scheduledExample ejecutada con éxito' }),
