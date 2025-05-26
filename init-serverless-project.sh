@@ -70,7 +70,6 @@ cat >package.json <<EOF
 {
   "name": "$PROJECT_NAME",
   "version": "1.0.0",
-  "type": "module",
   "description": "Serverless v4 TypeScript project",
   "main": "handler.js",
   "scripts": {
@@ -164,11 +163,11 @@ EOF
 
 echo -e "${GREEN}🔧 Creando configuración de ESLint...${NC}"
 cat > eslint.config.js << 'EOF'
-import js from '@eslint/js';
-import tseslint from '@typescript-eslint/eslint-plugin';
-import tsparser from '@typescript-eslint/parser';
+const js = require('@eslint/js');
+const tseslint = require('@typescript-eslint/eslint-plugin');
+const tsparser = require('@typescript-eslint/parser');
 
-export default [
+module.exports = [
   js.configs.recommended,
   {
     files: ['**/*.{ts}'],
@@ -197,7 +196,7 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-floating-promises': 'error',
-      'no-undef': 'off', // TypeScript maneja esto
+      'no-undef': 'off',
     },
   },
   {
@@ -218,9 +217,9 @@ export default [
   {
     files: ['eslint.config.js', 'jest.config.js'],
     languageOptions: {
-      sourceType: 'module',
+      sourceType: 'script',
       parserOptions: {
-        project: null, // No usar TypeScript para estos archivos
+        project: null,
       },
     },
   },
