@@ -43,28 +43,62 @@ else
 fi
 
 # 2️⃣ Validación de versión mínima de Serverless Framework (4.x)
-SL_VER=$(serverless --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-SL_MAJOR=$(echo "$SL_VER" | cut -d. -f1)
-if [ -z "$SL_MAJOR" ] || [ "$SL_MAJOR" -lt 4 ]; then
-  INSTALLED=$(serverless --version 2>/dev/null || echo "no instalada")
-  echo -e "${RED}❌ Tu Serverless CLI es $INSTALLED y se requiere v4.x${NC}"
-  echo -e "${YELLOW}Actualízala con: npm install -g serverless@^4${NC}"
-  exit 1
+# Intentar múltiples métodos para obtener la versión
+SL_VER=""
+
+# Método 1: serverless --version (formato "Serverless Framework X.Y.Z")
+if [ -z "$SL_VER" ]; then
+  SL_VER=$(serverless --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+fi
+
+# Método 2: sls --version 
+if [ -z "$SL_VER" ]; then
+  SL_VER=$(sls --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+fi
+
+# Método 3: Extraer de "Framework" específicamente
+if [ -z "$SL_VER" ]; then
+  SL_VER=$(serverless --version 2>/dev/null | sed -n 's/.*Framework \([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/p')
+fi
+
+# Método 4: npm list global como fallback
+if [ -z "$SL_VER" ]; then
+  SL_VER=$(npm list -g serverless --depth=0 2>/dev/null | grep serverless@ | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+fi
+
+echo -e "${BLUE}🔍 Debug: Versión detectada de Serverless: '$SL_VER'${NC}"
+
+if [ -n "$SL_VER" ]; then
+  SL_MAJOR=$(echo "$SL_VER" | cut -d. -f1)
+  if [ "$SL_MAJOR" -lt 4 ]; then
+    echo -e "${RED}❌ Tu Serverless CLI es v$SL_VER y se requiere v4.x${NC}"
+    echo -e "${YELLOW}Actualízala con: npm install -g serverless@^4${NC}"
+    exit 1
+  else
+    echo -e "${GREEN}✔ Serverless Framework $SL_VER cumple el requisito${NC}"
+  fi
 else
-  echo -e "${GREEN}✔ Serverless Framework $SL_VER cumple el requisito${NC}"
+  echo -e "${RED}❌ No se pudo detectar la versión de Serverless Framework${NC}"
+  echo -e "${YELLOW}Verifica que esté instalado con: serverless --version${NC}"
+  echo -e "${YELLOW}Output completo del comando:${NC}"
+  serverless --version 2>/dev/null || echo "Error ejecutando comando"
+  exit 1
 fi
 
 # ————————————————————————————————————————————————
 # 3️⃣ Chequeo de versiones globales contra npm
 
-# Serverless Framework
-INSTALLED_SL=$(serverless --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+# Serverless Framework - usar la versión ya detectada
+INSTALLED_SL="$SL_VER"
+
 LATEST_SL=$(npm view serverless version 2>/dev/null)
-if [ -n "$INSTALLED_SL" ] && [ "$INSTALLED_SL" != "$LATEST_SL" ]; then
+if [ -n "$INSTALLED_SL" ] && [ -n "$LATEST_SL" ] && [ "$INSTALLED_SL" != "$LATEST_SL" ]; then
   echo -e "${YELLOW}⚠️  Tu Serverless CLI está en v$INSTALLED_SL, pero la última es v$LATEST_SL${NC}"
   echo -e "${YELLOW}   Para actualizar: npm install -g serverless@^4${NC}"
-else
+elif [ -n "$INSTALLED_SL" ] && [ -n "$LATEST_SL" ]; then
   echo -e "${GREEN}✔ Serverless CLI v$INSTALLED_SL está al día (última: v$LATEST_SL)${NC}"
+else
+  echo -e "${YELLOW}⚠️  No se pudo verificar la versión de Serverless CLI contra npm${NC}"
 fi
 
 # serverless-offline (plugin)
