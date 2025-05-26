@@ -85,7 +85,8 @@ cat >package.json <<EOF
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@serverless/typescript": "^4.14.1",
+    "serverless": "^4.14.4",
+    "@serverless/typescript": "^4.14.4",
     "@types/aws-lambda": "^8.10.145",
     "@types/jest": "^29.5.8",
     "@types/node": "^20.10.0",
