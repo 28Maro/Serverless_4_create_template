@@ -82,7 +82,9 @@ cat > package.json << EOF
     "typescript": "^5.3.0"
   },
   "dependencies": {
-    "aws-lambda": "^1.0.7"
+    "@middy/core": "^5.0.0",
+    "@middy/http-json-body-parser": "^5.0.0",
+    "json-schema-to-ts": "^3.0.0"
   },
   "author": "",
   "license": "MIT"
