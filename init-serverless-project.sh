@@ -70,6 +70,7 @@ cat >package.json <<EOF
 {
   "name": "$PROJECT_NAME",
   "version": "1.0.0",
+  "type": "module",
   "description": "Serverless v4 TypeScript project",
   "main": "handler.js",
   "scripts": {
@@ -154,13 +155,15 @@ cat >tsconfig.json <<EOF
     "dist",
     "coverage",
     "*.test.ts",
-    "*.spec.ts"
+    "*.spec.ts",
+    "eslint.config.js",
+    "jest.config.js"
   ]
 }
 EOF
 
 echo -e "${GREEN}🔧 Creando configuración de ESLint...${NC}"
-cat >eslint.config.js <<'EOF'
+cat > eslint.config.js << 'EOF'
 import js from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
@@ -168,13 +171,21 @@ import tsparser from '@typescript-eslint/parser';
 export default [
   js.configs.recommended,
   {
-    files: ['**/*.{js,mjs,cjs,ts}'],
+    files: ['**/*.{ts}'],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
         ecmaVersion: 2022,
         sourceType: 'module',
         project: './tsconfig.json',
+      },
+      globals: {
+        process: 'readonly',
+        __dirname: 'readonly',
+        module: 'readonly',
+        require: 'readonly',
+        Buffer: 'readonly',
+        console: 'readonly',
       },
     },
     plugins: {
@@ -186,6 +197,31 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-floating-promises': 'error',
+      'no-undef': 'off', // TypeScript maneja esto
+    },
+  },
+  {
+    files: ['**/*.test.{ts,js}', '**/__tests__/**/*.{ts,js}'],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        jest: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['eslint.config.js', 'jest.config.js'],
+    languageOptions: {
+      sourceType: 'module',
+      parserOptions: {
+        project: null, // No usar TypeScript para estos archivos
+      },
     },
   },
   {
