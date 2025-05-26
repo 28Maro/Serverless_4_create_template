@@ -68,7 +68,7 @@ cd "$PROJECT_NAME"
 echo -e "${GREEN}📦 Inicializando package.json...${NC}"
 cat >package.json <<EOF
 {
-  "name": "$PROJECT_NAME",
+  "name": "$PROJECT_NAME_CLEAN",
   "version": "1.0.0",
   "description": "Serverless v4 TypeScript project",
   "main": "handler.js",
@@ -88,7 +88,7 @@ cat >package.json <<EOF
     "@serverless/typescript": "^4.14.1",
     "@types/aws-lambda": "^8.10.145",
     "@types/jest": "^29.5.8", 
-    "@types/node": "^22.10.0",
+    "@types/node": "^20.10.0",
     "jest": "^29.7.0",
     "serverless-offline": "^13.8.0",
     "ts-jest": "^29.2.0",
@@ -306,7 +306,7 @@ EOF
 echo -e "${GREEN}⚡ Creando configuración principal de Serverless (serverless.ts)...${NC}"
 cat >serverless.ts <<'EOF'
 import type { AWS } from '@serverless/typescript';
-import { hello } from '@functions/index';
+import { hello } from './src/functions/index';
 
 const serverlessConfiguration: AWS = {
   service: '$PROJECT_NAME_CLEAN',
