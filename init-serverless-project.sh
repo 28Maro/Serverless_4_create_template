@@ -29,13 +29,30 @@ if ! command -v npm &> /dev/null; then
     exit 1
 fi
 
-# Solicitar nombre del proyecto
-echo -e "${YELLOW}📝 Ingresa el nombre de tu proyecto:${NC}"
-read -p "Nombre del proyecto: " PROJECT_NAME
+# Obtener nombre del proyecto (parámetro o input interactivo)
+if [ -n "$1" ]; then
+    PROJECT_NAME="$1"
+    echo -e "${GREEN}📝 Usando nombre del proyecto: ${YELLOW}$PROJECT_NAME${NC}"
+elif [ -n "$PROJECT_NAME" ]; then
+    # Variable de entorno (para uso con curl)
+    echo -e "${GREEN}📝 Usando nombre del proyecto: ${YELLOW}$PROJECT_NAME${NC}"
+else
+    # Input interactivo
+    echo -e "${YELLOW}📝 Ingresa el nombre de tu proyecto:${NC}"
+    read -p "Nombre del proyecto: " PROJECT_NAME
+fi
 
+# Validar que el nombre no esté vacío
 if [ -z "$PROJECT_NAME" ]; then
     echo -e "${RED}❌ El nombre del proyecto no puede estar vacío.${NC}"
     exit 1
+fi
+
+# Limpiar el nombre del proyecto para que sea válido para Serverless
+PROJECT_NAME_CLEAN=$(echo "$PROJECT_NAME" | sed 's/[^a-zA-Z0-9-]//g' | sed 's/^[^a-zA-Z]*//' | sed 's/--*/-/g')
+if [ -z "$PROJECT_NAME_CLEAN" ]; then
+    PROJECT_NAME_CLEAN="my-serverless-project"
+    echo -e "${YELLOW}⚠️ Nombre corregido a: $PROJECT_NAME_CLEAN${NC}"
 fi
 
 # Verificar si el directorio ya existe
