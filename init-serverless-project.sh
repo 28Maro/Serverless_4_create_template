@@ -80,6 +80,21 @@ if command -v npm &>/dev/null; then
 fi
 # ————————————————————————————————————————————————
 
+# ————————————————————————————————————————————————
+# Chequeo de serverless-offline en el proyecto (no global)
+if [ -f package.json ]; then
+  INST_OFFLINE=$(npm ls serverless-offline --depth=0 2>/dev/null \
+    | grep serverless-offline@ | cut -d@ -f2)
+  LATEST_OFF=$(npm view serverless-offline version 2>/dev/null)
+  if [ -n "$INST_OFFLINE" ] && [ "$INST_OFFLINE" != "$LATEST_OFF" ]; then
+    echo -e "${YELLOW}⚠️  Tu proyecto usa serverless-offline v$INST_OFFLINE, pero la última es v$LATEST_OFF${NC}"
+    echo -e "${YELLOW}   Actualízalo con: npm install --save-dev serverless-offline@^14${NC}"
+  else
+    echo -e "${GREEN}✔ serverless-offline v${INST_OFFLINE:-"no instalado local"} está al día (última: v$LATEST_OFF)${NC}"
+  fi
+fi
+# ————————————————————————————————————————————————
+
 # Obtener nombre del proyecto (parámetro o input interactivo)
 if [ -n "$1" ]; then
   PROJECT_NAME="$1"
