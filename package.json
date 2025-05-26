@@ -18,7 +18,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tu-usuario/serverless-v4-typescript-template.git"
+    "url": "https://github.com/28Maro/Serverless_4_create_template.git"
   },
   "engines": {
     "node": ">=18.0.0"
