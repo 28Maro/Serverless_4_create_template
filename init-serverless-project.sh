@@ -91,7 +91,7 @@ cat >package.json <<EOF
     "@types/jest": "^29.5.8",
     "@types/node": "^20.10.0",
     "jest": "^29.7.0",
-    "serverless-offline": "^13.8.0",
+    "serverless-offline": "^14.0.0",  // ← Cambiar a versión 14
     "ts-jest": "^29.2.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.0"
