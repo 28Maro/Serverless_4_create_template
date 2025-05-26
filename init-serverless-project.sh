@@ -13,14 +13,13 @@ echo -e "${BLUE}====================================================${NC}"
 # Verificar si Serverless Framework está instalado
 if ! command -v serverless &>/dev/null; then
   echo -e "${RED}❌ Serverless Framework no está instalado.${NC}"
-  echo -e "${YELLOW}Instálalo con: npm install -g serverless@^4${NC}"
+  echo -e "${YELLOW}Instálalo con: npm install -g serverless${NC}"
   exit 1
 fi
 
 # Verificar si Node.js está instalado
 if ! command -v node &>/dev/null; then
   echo -e "${RED}❌ Node.js no está instalado.${NC}"
-  echo -e "${YELLOW}Instálalo con: nvm install 22 && nvm use 22${NC}"
   exit 1
 fi
 
@@ -29,30 +28,6 @@ if ! command -v npm &>/dev/null; then
   echo -e "${RED}❌ npm no está instalado.${NC}"
   exit 1
 fi
-
-# ————————————————————————————————————————————————
-# Validación de versión mínima de Node.js (22.x)
-NODE_VER=$(node -v)
-NODE_MAJOR=$(echo "$NODE_VER" | sed 's/v\([0-9]\+\).*/\1/')
-if [ "$NODE_MAJOR" -lt 22 ]; then
-  echo -e "${RED}❌ Tu versión de Node.js es $NODE_VER pero se requiere >= v22.x${NC}"
-  echo -e "${YELLOW}Actualízala con: nvm install 22 && nvm use 22${NC}"
-  exit 1
-else
-  echo -e "${GREEN}✔ Node.js $NODE_VER cumple el requisito${NC}"
-fi
-
-# Validación de versión mínima de Serverless Framework (4.x)
-SL_VER=$(serverless --version 2>/dev/null | awk '{print $2}')
-SL_MAJOR=$(echo "$SL_VER" | cut -d. -f1)
-if [ -z "$SL_MAJOR" ] || [ "$SL_MAJOR" -lt 4 ]; then
-  echo -e "${RED}❌ Tu Serverless CLI es $(serverless --version 2>/dev/null || echo 'no instalada') y se requiere v4.x${NC}"
-  echo -e "${YELLOW}Actualízala con: npm install -g serverless@^4${NC}"
-  exit 1
-else
-  echo -e "${GREEN}✔ Serverless Framework $SL_VER cumple el requisito${NC}"
-fi
-# ————————————————————————————————————————————————
 
 # Obtener nombre del proyecto (parámetro o input interactivo)
 if [ -n "$1" ]; then
