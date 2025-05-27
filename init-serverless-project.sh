@@ -188,23 +188,22 @@ cat >package.json <<EOF
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "serverless": "^4.14.1",
-    "@serverless/typescript": "^4.14.1",
-    "@types/aws-lambda": "^8.10.145",
-    "@types/jest": "^29.5.8",
-    "@types/node": "^20.10.0",
+    "serverless": "^4.15.1",
+    "@serverless/typescript": "^4.15.1",
+    "@types/aws-lambda": "^8.10.147",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.2",
     "jest": "^29.7.0",
-    "serverless-offline": "^14.0.0", 
-    "ts-jest": "^29.2.0",
+    "serverless-offline": "^14.3.3",
+    "ts-jest": "^29.2.5",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.0",
-    "@middy/http-json-body-parser": "^5.5.0",
-    "@middy/validator": "^5.5.0"
+    "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@middy/core": "^5.5.0",
-    "@middy/http-json-body-parser": "^5.5.0",
-    "json-schema-to-ts": "^3.1.0"
+    "@middy/core": "^5.5.1",
+    "@middy/http-json-body-parser": "^5.5.1",
+    "@middy/validator": "^5.5.1",
+    "json-schema-to-ts": "^3.2.0"
   },
   "author": "OLC",
   "license": "MIT"
