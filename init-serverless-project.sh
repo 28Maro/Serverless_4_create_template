@@ -418,7 +418,7 @@ echo -e "${GREEN}⚡ Creando configuración principal de Serverless (serverless.
 cat >serverless.ts <<'EOF'
 import 'tsconfig-paths/register'; 
 import type { AWS } from '@serverless/typescript';
-import { hello } from './src/functions/index';
+import { hello, scheduledExample } from './src/functions/index';
 
 const serverlessConfiguration: AWS = {
   service: '$PROJECT_NAME_CLEAN',
@@ -492,20 +492,7 @@ const serverlessConfiguration: AWS = {
 
   functions: {
     hello,
-    // Función de ejemplo programada cada 5 minutos
-    scheduledExample: {
-      handler: 'src/functions/scheduled/handler.main',
-      events: [
-        {
-          schedule: {
-            rate: ['rate(5 minutes)'],
-            enabled: true,
-            name: '${self:service}-${self:provider.stage}-scheduledExample',
-            description: 'Invocación programada cada 5 min para ejemplo',
-          },
-        },
-      ],
-    },
+    scheduledExample
   },
 
   package: {
