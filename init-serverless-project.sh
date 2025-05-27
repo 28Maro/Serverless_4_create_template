@@ -191,23 +191,20 @@ cat >package.json <<EOF
     "serverless": "^4.14.1",
     "@serverless/typescript": "^4.14.1",
     "@types/aws-lambda": "^8.10.145",
-    "@types/jest": "^29.5.12",
-    "@types/node": "^22.10.1",
+    "@types/jest": "^29.5.8",
+    "@types/node": "^20.10.0",
     "jest": "^29.7.0",
     "serverless-offline": "^14.0.0",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.2.0",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.0",
+    "@middy/http-json-body-parser": "^5.5.0",
+    "@middy/validator": "^5.5.0"
   },
   "dependencies": {
     "@middy/core": "^5.5.0",
     "@middy/http-json-body-parser": "^5.5.0",
-    "@middy/validator": "^5.5.0",
     "json-schema-to-ts": "^3.1.0"
-  },
-  "engines": {
-    "node": ">=22.0.0",
-    "npm": ">=10.0.0"
   },
   "author": "OLC",
   "license": "MIT"
